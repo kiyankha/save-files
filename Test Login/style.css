@@ -1,0 +1,296 @@
+* {
+    margin: 0;
+    padding: 0;
+
+
+}
+
+.main {
+    width: 100%;
+    background: linear-gradient(to top,rgba(0,0,0,0.5)50%,rgba(0,0,0,0.5)50%), url(1.jpg);
+    background-position: center;
+    background-size: cover;
+    height: 109vh;
+}
+.navbar {
+    width: 1200px;
+    height: 75px;
+    margin: auto;
+}
+.icon {
+    width: 200px;
+    float: left;
+    height: 70px;
+}
+.logo {
+    color: #eee53f;
+    translate: -100px;
+}
+.menu {
+    width: 400px;
+    float: left;
+    height: 70px;
+}
+ul {
+    float: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: solid white; */
+
+
+}
+
+ul li {
+    list-style: none;
+    margin-left: 60px;
+    margin-top: 40px;
+    font-size: 24px;
+    
+}
+
+ul li a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    transition: 0.5s ease-in-out;
+}
+
+ul li a:hover {
+    color: yellowgreen;
+}
+.search {
+    width: 330px;
+    float: left;
+    margin-left: 270px;
+}
+
+.srch {
+    font-family: 'Times New Roman', Times, serif;
+    width: 200px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid yellow;
+    color: white;
+    border-right: none;
+    font-size: 16px;
+    float: left;
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    margin-top: 13px;
+    translate: 180px;
+    
+}
+.btn {
+    width: 100px;
+    height: 40px;
+    background: orange;
+    border: 2px solid yellow;
+    margin-top: 13px;
+    font-size: 16px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    translate: 180px;
+    cursor: pointer;
+
+}
+
+.btn:focus {
+    outline: none;
+}
+
+.srch:focus {
+    outline: none;
+}
+
+.txt {
+    height: auto;
+    margin-top: 15px;
+    padding-top: 10px;
+    position: absolute;
+    top: 80px;
+    left: 90px;
+    color: white;
+    /* border: solid green; */
+    float: left;
+    margin-left: 0;
+    
+
+    
+    
+
+    
+    
+    
+}   
+
+
+.txt p {
+    padding-bottom: 25px;
+    font-family: Arial;
+    font-size: 20px;
+    line-height: 30px;
+    letter-spacing: 1.2px;
+    /* border: solid green; */
+    float: left;
+    padding-top: 0;
+    text-align: left;
+    
+
+}
+
+.txt h1 {
+    padding-top: 200px;
+    padding-bottom: 0;
+    text-align: left;
+    /* border: solid yellow; */
+    padding-left: 0;
+    font-size: 50px;
+
+}
+
+.txt  button {
+    width: 160px;
+    height: 50px;
+    background: yellow;
+    text-decoration: none;
+    border: none;
+    margin-top: 20px;
+    font-size: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.4s ease;
+}
+
+.btn3:hover {
+    background-color: rgb(245, 171, 35);
+}
+
+.sptx {
+    color: yellow;
+}
+
+.form {
+    width: 250px;
+    height: 380px;
+    position: absolute;
+    top: 150px;
+    right: 30px;
+    /* border: solid red; */
+    border-radius: 10px;
+    padding: 25px;
+    background: linear-gradient(to top, rgba(0,0,0,0.5)50%,rgba(0,0,0,0.5)50%);
+}
+
+.form h2 {
+    width: 220px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: yellow;
+    font-size: 28px;
+    text-align: center;
+    margin: 2px;
+    padding: 8px;
+    /* background-color: rgba(231, 233, 45, 0.5); */
+}
+
+.form input {
+    width: 240px;
+    height: 35px;
+    background: transparent;
+    border-bottom: 1px solid yellow;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    color: white;
+    font-size: 18px;
+    letter-spacing: 1.4px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.form input:focus {
+    outline: none;
+}
+
+::placeholder {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: white;
+}
+
+.btnlog {
+    width: 240px;
+    height: 45px;
+    background: yellow;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 35px;
+    cursor: pointer;
+    transition: 0.4s ease;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+}
+
+.btnlog:hover {
+    background: transparent;
+    color: yellow;   
+}
+
+.sgnutxt {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sa {
+    margin-bottom: 30px;
+    border-top: 0;
+    margin-left: 70px; 
+    color: yellow;
+    font-size: 22px;
+    font-family: Haettenschweiler;
+    text-decoration: none;
+}
+
+.or {
+    margin-top: 10px;
+    color: white;
+    font-size: 17px;
+    text-align: center;
+}
+
+.logw {
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.icons a {
+    text-decoration: none;
+    color: white;
+}
+
+.icons ion-icon {
+    color: white;
+    font-size: 30px;
+    padding-left: 14px;
+    padding-top: 10px;
+
+}
+
+.icons ion-icon:hover {
+    color: yellow;
+    transition: 0.3s ease;
+}
+
+
+
+
+
