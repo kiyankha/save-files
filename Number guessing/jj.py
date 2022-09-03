@@ -1,2 +1,0 @@
-import pyfiglet
-help(pyfiglet)
