@@ -36,38 +36,69 @@ void index_mat_config(int pos,int num)
         if(inc_index_mat[col][pos] == -1)
         {
             inc_index_mat[col][pos] = num;
+            break;
         }
     }
 }
-bool check_if_rep(string str)
+bool check_if_rep(string str,char num)
 {
-
+    int cnt = 0;
     for (int i = 0; i < str.length(); i++) 
     {
-      for (int j = i + 1; j < str.length(); j++)
-       {
-         if (str[i] == str[j]) 
+      
+         if (str[i] == num) 
          {
-            return 1;
+            cnt++;
          }
-      }
    }
-   return 0;
+   if(cnt >1)
+   {
+        return 1;
+   }
+   else
+   {
+    return 0;
+   }
+}
+string swap_guess(string guess)
+{
+    int cnt1=0,cnt2=0;
+    while(1)
+    {
+        if(arr_cor_pos[cnt1]!=1)
+        {
+            if(arr_cor_pos[cnt2]!=1)
+            {
+                swap(guess[cnt1],guess[cnt2]);
+                break;
+            }
+            else
+            {
+                cnt2++;
+            }
+        }
+        else
+        {
+            cnt1++;
+        }
+    }
+    return guess;
 }
 int main()
 {
     int int_guess;
-    int_guess = 9752;
+    //int_guess = 9752;
     string str_guess="", str_guess_backup="", prev_guess = "";
-    str_guess = int_to_string(int_guess);
+    str_guess = "9752";
     int feed_num, prev_feed_num ;
     int feed_index, prev_feed_index;
-    int counter = 0, index_counter, nc_count =0,cnt = 0;
+    int counter = 0, index_counter = 0, nc_count =0,cnt = 0,pos_cnt = 0;
+    int nex_cor = 0;
     char temp1;
     int turn = 1;
     bool first_index = true;
     bool dig_is_correct, digs_are_correct;
-    bool prev_guess_cor = false;
+    bool prev_guess_cor = false, rep = false, nex_cor_eq = false, change = false;
     bool win = false;
     for(int row=0;row<3;row++)
     {
@@ -76,7 +107,7 @@ int main()
             inc_index_mat[row][col] = -1;
         }
     }
-    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<int_guess;
+    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
     cout<<endl<<"Number of correct digits: ";
     cin>>feed_num;
     if((feed_num >=0) && (feed_num<4))
@@ -87,16 +118,19 @@ int main()
     {
         digs_are_correct = true;
     }
+    str_guess_backup = str_guess;
     prev_feed_num = feed_num;
     cout<<endl<<"Number of correct digits with correct position: ";
     cin>>feed_index;
     prev_feed_index = feed_index;
     //Phase 1: Finding the correct digits
+    
     while(digs_are_correct == false)
     {
         switch (feed_num)
         {
             case 0:
+                    cnt = 0;
                     counter = 0;
                     index_counter = 0;
                     dig_is_correct = false;
@@ -130,169 +164,263 @@ int main()
                     dig_is_correct = false;
                     counter = 8;
                     index_counter = 0;
-                    while(prev_feed_num < 4)
+                    while(feed_num < 4)
                     {
                         dig_is_correct = false;
-                        //cout<<endl<<"this is index:"<<index_counter<<" and counter:"<<counter<<" and first_index:"<<first_index<<endl;
-                        if(prev_guess_cor = true)
+                        
+                        if(prev_guess_cor == true && prev_guess.length())
                         {
-                            for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
+                            cout<<endl<<"oh this prev_guess_cor is working!!!";
+                            cout<<endl<<"this is prev_guess:"<<prev_guess<<" and guess before change: "<<str_guess;
+                            int str_indx=0;
+                            while(str_indx<prev_guess.length() && index_counter < 4)
                             {
-                                for(int pos_cnt=0;pos_cnt<3;pos_cnt++)
+                                if(arr_cor_pos[index_counter] != 1)
                                 {
-                                    if(arr_cor_pos[pos_cnt] != 1)
-                                    {
-                                        if(arr_del_nums[int(str_guess[pos_cnt])-48] != 2)
-                                        {
-                                            str_guess[pos_cnt] = prev_guess[str_indx];
-                                        }
-                                    }
+                                    cout<<endl<<"now gonna replacing ["<<prev_guess[str_indx]<<"]";
+                                    str_guess[index_counter] = prev_guess[str_indx];
+                                    index_counter++;
                                 }
+                                str_indx++;
                             }
+                            cout<<endl<<"this is guess after change: "<<str_guess;
+
+                        }
+                        if(index_counter == 4)
+                        {
+                            digs_are_correct = true;
+                            prev_feed_num = feed_num;
+                            prev_feed_index = feed_index;
+                            turn++;
+                            cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                            cout<<endl<<"Enter the number of correct digits: ";
+                            cin>>feed_num;
+                            cout<<endl<<"Number of correct digits with correct position: ";
+                            cin>>feed_index;
+                            break;
                         }
                         prev_guess_cor = false;
                         prev_guess = "";
                         nc_count=0;
-                        //cout<<endl<<"##################################\nCorrect numbers: "<<prev_feed_num<<"\n##################################";
-                        while(dig_is_correct == false)
+                        if(arr_cor_pos[index_counter] != 1)
                         {
-                            if(feed_num == 0)
+                            while(dig_is_correct == false)
                             {
-                                for(int str_indx=0;str_indx<str_guess.length();str_indx++)
+                                if((arr_del_nums[counter] != 1) && (arr_del_nums[counter] != 3) && (prev_guess.find(char(counter+48)) == -1))
                                 {
-                                    arr_del_nums[int(str_guess[str_indx]) - 48] = 1;
+                                    prev_feed_num = feed_num;
+                                    prev_feed_index = feed_index;
+                                    temp1 = str_guess[index_counter];
+                                    cout<<endl<<"**********************************";
+                                    cout<<endl<<"changing index: "<<index_counter;
+                                    cout<<endl<<"temp1 is: "<<temp1;
+                                    cout<<endl<<"prev_guess is:"<<prev_guess;
+                                    cout<<"\n^^^^^\nPrev feed num: "<<prev_feed_num<<"\nPrev feed index: "<<prev_feed_index<<"\n^^^^^";
+                                    str_guess_backup = str_guess;
+                                    str_guess[index_counter] = char(counter + 48);
+                                    if(str_guess != str_guess_backup)
+                                    {
+                                        cout<<endl<<"backup: "<<str_guess_backup<<" new guess: "<<str_guess;
+                                        turn++;
+                                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                                        cout<<endl<<"Enter the number of correct digits: ";
+                                        cin>>feed_num;
+                                        cout<<endl<<"Number of correct digits with correct position: ";
+                                        cin>>feed_index;
+                                        cout<<endl<<"new feeds: f1: "<<feed_num<<" f2: "<<feed_index;
+                                        cout<<endl<<"Diff: f1n - f1p: "<<feed_num - prev_feed_num;
+                                        //-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1
+                                        if(feed_num - prev_feed_num == -1)
+                                        {
+                                            dig_is_correct = true;
+                                            cout<<endl<<"f1 change: -1"<<endl;
+                                            cout<<"temp1: "<<temp1;
+                                            cout<<endl<<"check if: "<<check_if_rep(str_guess,char(counter+48))<<" for counter: "<<counter<<" in guess: "<<str_guess;
+                                            if(check_if_rep(str_guess,char(counter+48)) == 1)
+                                            {
+                                                cout<<endl<<"check rep is: "<<check_if_rep<<" and deleteing counter: "<<counter;
+                                                arr_del_nums[counter] = 3;
+                                            }
+                                            cout<<endl<<"before change: "<<str_guess;
+                                            str_guess[index_counter] = temp1;
+                                            cout<<endl<<"after change 1: "<<str_guess;
+                                            arr_del_nums[int(temp1)-48] = 2;
+                                            if(str_guess_backup.find(char(counter+48)) == -1)
+                                            {
+                                                cout<<endl<<"now this incor num wasn't in org  ->counter: "<<counter;
+                                                arr_del_nums[counter] = 1;
+                                            }
+                                            //Error
+                                            if(nc_count > 4-feed_num)
+                                            {
+                                                error_cout("\nError!!!!\nWrong feedback!!!\n");
+                                            }
+                                            else
+                                            {
+                                                for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
+                                                {
+                                                    arr_del_nums[int(prev_guess[str_indx])-48] = 2;
+                                                }
+                                                prev_guess_cor = true;
+                                            }
+                                            cout<<endl<<"this is nc_count: "<<nc_count<<" and prev_guess_cor: "<<prev_guess_cor;
+                                            if(feed_index - prev_feed_index == -1)
+                                            {
+                                                arr_cor_pos[index_counter] = 1;
+                                            }
+                                            feed_index = prev_feed_index;
+                                            feed_num = prev_feed_num;
+                                            cnt = 0;
+                                            for(int i=0;i<10;i++)
+                                            {
+                                                if((arr_del_nums[i] != 0) && (arr_del_nums[i] != 1))
+                                                {
+                                                    cnt++;
+                                                }
+                                            }
+                                            cout<<endl<<"()()()this is cnt: "<<cnt;
+                                            if(cnt == prev_feed_num)
+                                            {
+                                                cout<<endl<<"correct nums are found,now removing wrong ones";
+                                                cout<<endl<<"checking for 2: "<<arr_del_nums[2];
+                                                for(int str_indx=0;str_indx<4;str_indx++)
+                                                {
+                                                    if((arr_del_nums[int(str_guess[str_indx])-48] != 2) && (arr_del_nums[int(str_guess[str_indx])-48] != 3))
+                                                    {
+                                                        cout<<endl<<"this counter: "<<int(str_guess[str_indx])-48<<" for index: "<<str_indx;
+                                                        cout<<endl<<"now configuring: "<<str_guess[str_indx];
+                                                        arr_del_nums[int(str_guess[str_indx])-48] = 1;
+                                                    }
+                                                }
+                                            }
+                                            cout<<endl<<"end -1: "<<str_guess;
+                                        }
+                                        //00000000000000000000000000000000000000000000000000000
+                                        else if(feed_num - prev_feed_num == 0)
+                                        {
+                                            cout<<endl<<"f1-change: 0";
+                                            cout<<endl<<"before change: "<<str_guess;
+                                            cout<<endl<<"Counter: "<<counter<<endl;
+                                            if((prev_guess.find(temp1) == -1) && (arr_del_nums[int(temp1)-48] != 1))
+                                            {
+                                                prev_guess.push_back(temp1);
+                                                nc_count++;
+                                            }
+                                            cout<<endl<<"prev_guess: "<<prev_guess<<" nc_count: "<<nc_count<<"\n-------------------"<<endl;
+                                            if(nc_count > 4-feed_num)
+                                            {
+                                                for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
+                                                {
+                                                    arr_del_nums[int(prev_guess[str_indx]) - 48] = 1;
+                                                }
+                                            }
+                                            if(feed_index - prev_feed_index == -1)
+                                            {
+                                                cout<<endl<<"f2n - f2p: "<<-1;
+                                                cout<<endl<<"change 0: temp1: "<<temp1;
+                                                str_guess[index_counter] = temp1;
+                                                arr_cor_pos[index_counter] = 1;
+                                                arr_del_nums[int(temp1)-48] = 2;
+                                                arr_del_nums[counter] = 2;
+                                                dig_is_correct = true;
+                                                cout<<endl<<"temp1: "<<temp1<<" counter: "<<counter;
+                                            }
+                                            else if(feed_index - prev_feed_index == 1)
+                                            {
+                                                cout<<endl<<"f2n - f2p: "<<1;
+                                                arr_cor_pos[index_counter] = 1;
+                                                if(arr_del_nums[int(temp1)-48] != 1)
+                                                {
+                                                    arr_del_nums[int(temp1)-48] = 2;
+                                                }
+                                                arr_del_nums[counter] = 2;
+                                                dig_is_correct = true;
+                                                rep = check_if_rep(str_guess,char(counter+48));
+                                                cout<<endl<<"checking for rep: "<<rep;
+                                                if(rep == true)
+                                                {
+                                                    cout<<endl<<"finding previous counter: "<<counter;
+                                                    cout<<endl<<"prev/next index: "<<str_guess.find(char(counter+48))<<" ans arrpos[prev/next]: "<<arr_cor_pos[counter];
+                                                    if(arr_cor_pos[str_guess_backup.find(char(counter+48))] == 0)
+                                                    {
+                                                        index_counter = str_guess_backup.find(char(counter+48))-1;
+                                                        cout<<endl<<"now index-counter: "<<index_counter;
+                                                    }
+                                                }
+                                                if(prev_guess.length()>0 && rep == 0)
+                                                {
+                                                    prev_guess_cor = true;
+                                                }
+                                            }
+                                            cout<<endl<<"end 0: "<<str_guess;
+                                        }
+                                        //1111111111111111111111111111111111111111111111111111111111
+                                        else if(feed_num - prev_feed_num == 1)
+                                        {
+                                            cout<<endl<<"f1 change: 1"<<endl;
+                                            cout<<endl<<"before change: "<<str_guess;
+                                            str_guess[index_counter] = char(counter+48);
+                                            cout<<endl<<"after change 1: "<<str_guess;
+                                            cout<<endl<<"oh this is backup: "<<str_guess_backup;
+                                            arr_del_nums[counter] = 2;
+                                            dig_is_correct = true;
+                                            cout<<endl<<"prev pos: "<<str_guess.find(temp1);
+                                            if(str_guess.find(temp1) == -1)
+                                            {
+                                                cout<<endl<<"(:-|_|-:) oh the prev was wrong!!!! now removing: "<<int(temp1)-48;
+                                                arr_del_nums[int(temp1)-48] = 1;
+                                                cout<<endl<<"oh nooo:"<<endl;
+                                                for(int i=0;i<10;i++)
+                                                {
+                                                    cout<<arr_del_nums[i];
+                                                }
+                                            }
+                                            if(feed_index - prev_feed_index == 1)
+                                            {
+                                                arr_cor_pos[index_counter] = 1;
+                                                rep = check_if_rep(str_guess,char(counter+48));
+                                                if(rep == true)
+                                                {
+                                                    if(arr_cor_pos[str_guess.find(char(counter+48))] == 0)
+                                                    {
+                                                        index_counter -= 2;
+                                                    }
+                                                }
+                                            }
+                                            cout<<endl<<"removing prev_guess: "<<prev_guess;
+                                            for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
+                                            {
+                                                if(str_guess_backup.find(prev_guess[str_indx]) == -1)
+                                                {
+                                                    arr_del_nums[int(prev_guess[str_indx])-48] = 1;
+                                                }
+                                            }
+                                            cout<<endl<<"end 1: "<<str_guess;
+                                            counter++;
+                                        }
+                                        cout<<endl<<"end of while dig is correct:\narrdelnums: "<<endl;
+                                        for(int i=0;i<10;i++)
+                                        {
+                                            cout<<arr_del_nums[i];
+                                        }
+                                        cout<<endl<<"arrcospos: "<<endl;
+                                        for(int i=0;i<4;i++)
+                                        {
+                                            cout<<arr_cor_pos[i];
+                                        }
+                                        cout<<endl<<"**********************************"<<endl;
+                                    }
+                                    
                                 }
+                                counter--; 
                             }
-                            if(arr_del_nums[counter] != 1)
-                            {
-                                //cout<<endl<<"---------\nCounter: "<<counter<<"\nIndex counter: "<<index_counter<<"\n---------";
-                                prev_feed_num = feed_num;
-                                prev_feed_index = feed_index;
-                                temp1 = str_guess[index_counter];
-                                cout<<endl<<"**********************************";
-                                cout<<endl<<"temp1 is: "<<temp1;
-                                str_guess[index_counter] = char(counter + 48);
-                                turn++;
-                                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                cout<<endl<<"Enter the number of correct digits: ";
-                                cin>>feed_num;
-                                cout<<endl<<"Number of correct digits with correct position: ";
-                                cin>>feed_index;
-                                cout<<endl<<"Prev feed num: "<<prev_feed_num<<" Prev feed index: "<<prev_feed_index;
-                                cout<<endl<<"new feeds: f1: "<<feed_num<<" f2: "<<feed_index;
-                                cout<<endl<<"Diff: f1n - f1p: "<<feed_num - prev_feed_num;
-                                //-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1-1
-                                if(feed_num - prev_feed_num == -1)
-                                {
-                                    dig_is_correct = true;
-                                    cout<<endl<<"f1 change: -1"<<endl;
-                                    cout<<"temp1: "<<temp1;
-                                    str_guess[index_counter] = temp1;
-                                    cout<<endl<<str_guess;
-                                    inc_index_mat[0][index_counter] = int(str_guess[index_counter])-48;
-                                    arr_del_nums[int(temp1)-48] = 2;
-                                    if(str_guess_backup.find(char(counter+48)) == -1)
-                                    {
-                                        arr_del_nums[counter] = 1;
-                                    }
-                                    //Error
-                                    if(nc_count+1 > 4-prev_feed_num)
-                                    {
-                                        error_cout("Error!!!!\nWrong feedback!!!\n");
-                                    }
-                                    else
-                                    {
-                                        for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
-                                        {
-                                            arr_del_nums[int(prev_guess[str_indx])-48] = 2;
-                                        }
-                                        prev_guess_cor = true;
-                                    }
-                                    if(feed_index - prev_feed_index == 0)
-                                    {
-                                        index_mat_config(index_counter,int(temp1)-48);
-                                    }
-                                    else if(feed_index - prev_feed_index == -1)
-                                    {
-                                        arr_cor_pos[index_counter] = 1;
-                                    }
-                                    feed_index = prev_feed_index;
-                                    feed_num = prev_feed_num;
-                                    //cout<<endl<<"**********************************"<<endl;
-                                }
-                                //00000000000000000000000000000000000000000000000000000
-                                else if(feed_num - prev_feed_num == 0)
-                                {
-                                    cout<<endl<<"f1-change: 0"<<endl;
-                                    cout<<endl<<"0 Counter: "<<counter<<endl;
-                                    prev_guess.push_back(temp1);
-                                    nc_count++;
-                                    cout<<endl<<"prev_guess: "<<prev_guess<<" nc_count: "<<nc_count<<"\n-------------------"<<endl;
-                                    if(nc_count+1 > 4-prev_feed_num)
-                                    {
-                                        for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
-                                        {
-                                            arr_del_nums[int(prev_guess[str_indx]) - 48] = 1;
-                                        }
-                                    }
-                                    if(feed_index - prev_feed_index == -1)
-                                    {
-                                        str_guess[index_counter] = int(temp1)- 48;
-                                        arr_cor_pos[index_counter] = 1;
-                                        index_mat_config(index_counter,counter);
-                                    }
-                                    else if(feed_index - prev_feed_index == 1)
-                                    {
-                                        arr_cor_pos[index_counter] = 1;
-                                        index_mat_config(index_counter,int(temp1)-48);
-                                    }
-                                    //cout<<endl<<"**********************************"<<endl;
-                                }
-                                //1111111111111111111111111111111111111111111111111111111111
-                                else if(feed_num - prev_feed_num == 1)
-                                {
-                                    cout<<endl<<"f1 change: 1"<<endl;
-                                    cout<<endl<<"before change: "<<str_guess;
-                                    str_guess[index_counter] = char(counter+48);
-                                    cout<<endl<<"ch1: "<<str_guess;
-                                    arr_del_nums[counter] = 2;
-                                    dig_is_correct = true;
-                                    if(str_guess_backup.find(temp1)==-1)
-                                    {
-                                        arr_del_nums[int(temp1)-48] == 1;
-                                    }
-                                    if(feed_index - prev_feed_index == 0)
-                                    {
-                                        index_mat_config(index_counter,int(temp1)-48);
-                                    }
-                                    else if(feed_index - prev_feed_index == 1)
-                                    {
-                                        arr_cor_pos[index_counter] = 1;
-                                        index_mat_config(index_counter,int(temp1)-48);
-                                    }
-                                    for(int str_indx=0;str_indx<prev_guess.length();str_indx++)
-                                    {
-                                        if(str_guess_backup.find(prev_guess[str_indx]) == -1)
-                                        {
-                                            arr_del_nums[int(prev_guess[str_indx])-48] = 1;
-                                        }
-                                    }
-                                    cout<<endl<<"after change: "<<str_guess;
-                                    //cout<<endl<<"**********************************"<<endl;
-                                }
-                                cout<<endl<<"end of while dig is correct: "<<endl;
-                                for(int i=0;i<10;i++)
-                                {
-                                    cout<<arr_del_nums[i];
-                                }
-                                cout<<endl<<"**********************************"<<endl;
-                            }
-                            counter--;
-                            
                         }
                         index_counter++;
                         first_index = false;
-                        counter = 9;
+                        if(rep == false)
+                        {
+                            counter = 9;
+                        }
                     }
                     digs_are_correct = true;
                     break;   
@@ -304,439 +432,259 @@ int main()
                     break;
         }
     }
-    cout<<endl<<"so this is after finding the correct digits";
-   /* 
-    cout<<endl<<"First stage of index mat: ";
-    for(int i=0;i<3;i++)
+    cout<<endl<<"----------------------\nso this is after finding the correct digits";
+    //Phase 2:Finding the correct positions
+    int counter_1 = 0,counter_2 = 0;
+    int cont__1[4] = {0};
+    bool swap_dig = false, swap_oth = false;
+    int case_0_cnt = 0;
+    str_guess_backup = str_guess;
+    counter_2++;
+    if(feed_index==4)
     {
-        cout<<endl;
-        for(int j=0;j<4;j++)
+        cout<<endl<<"I won!!!!";
+        return 0;
+    }
+    else if(feed_index<4)
+    {
+       while(1)
         {
-            cout<<inc_index_mat[i][j]<<' ';
+            if(arr_cor_pos[counter_1] != 1)
+            {
+                if((str_guess[counter_1] != str_guess[counter_2]) && arr_cor_pos[counter_2]!=1)
+                {
+                        swap(str_guess[counter_1],str_guess[counter_2]);
+                        break;
+                }
+                else
+                {
+                    counter_2++;
+                }
+            }
+            else
+            {
+                counter_1++;
+            }
         }
     }
+    prev_feed_index = feed_index;
+    turn++;
     cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-    cout<<endl<<"Number of correct positions: ";
+    cout<<endl<<"Number of correct digits with correct position: ";
     cin>>feed_index;
-    //Phase 2:Finding the correct positions
-    // cout<<endl<<"Stage: "<<stage<<"  Guess: "<<str_guess;
-    // cout<<endl<<"Enter the number of correct digits: ";
-    int counter_1 = 0,counter_2 = 0;
-    bool pos_check[4] = {0};//0 -> Put  1->Don't put
-    int pos_num[4] = {0};
-    int temp2;
-    while(1)
+    while(feed_index<4)
     {
-        switch (feed_index) 
+        switch(feed_index - prev_feed_index)
         {
+            case -2:
+                cout<<endl<<"-2-2-2-2-2-2\nEntering case -2\n-2-2-2-2-2-2\n";
+                //Undoing changes
+                swap(str_guess[counter_1],str_guess[counter_2]);
+                swap(str_guess[3-counter_1],str_guess[3-counter_2]);
+                turn++;
+                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                cout<<endl<<"Number of correct digits with correct position: ";
+                cin>>feed_index;
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                break;
+            case -1:
+                cout<<endl<<"-1-1-1-1-1-1\nEntering case -1\n-1-1-1-1-1-1\n";
+                //Undoing changes
+                swap(str_guess[counter_1],str_guess[counter_2]);
+                //str_guess[counter_1] is right
+                cout<<endl<<"now assuming str_guess[counter_1] is right: "<<str_guess[counter_1];
+                swap_dig = true;
+                while((feed_index != 0) || (feed_index != 4))
+                {
+                    if(swap_dig == true)
+                    {
+                        cout<<endl<<"this is swap dig";
+                        for(int str_indx=0;str_indx<4;str_indx++)
+                        {
+                            if((str_indx != counter_1) && (str_indx != counter_2) && (arr_cor_pos[str_indx] != 1))
+                            {
+                                cout<<endl<<"now swapping counter_2: "<<str_guess[counter_2]<<" with str_indx: "<<str_indx;
+                                swap(str_guess[counter_2],str_guess[str_indx]);
+                                break;
+                            }
+                        }
+                    }
+                    if(swap_oth == true)
+                    {
+                        cout<<endl<<"now swapping 3-counter_1: "<<str_guess[3-counter_1]<<" with 3-counter_2 "<<str_guess[3-counter_2];
+                        swap(str_guess[3-counter_1],str_guess[3-counter_2]);
+                    }
+                    prev_feed_index = feed_index;
+                    turn++;
+                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                    cout<<endl<<"Number of correct digits with correct position: ";
+                    cin>>feed_index;
+                    str_guess_backup = str_guess;
+                    swap_dig = !(swap_dig);
+                    swap_oth = !(swap_oth);
+                }
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                //str_guess[counter_2] is right
+                cout<<endl<<"now assuming str_guess[counter_2] is right: "<<str_guess[counter_2];
+                swap_dig = true;
+                swap_oth = false;
+                while((feed_index != 0) || (feed_index != 4))
+                {
+                    if(swap_dig == true)
+                    {
+                        cout<<endl<<"this is swap dig";
+                        for(int str_indx=0;str_indx<4;str_indx++)
+                        {
+                            if((str_indx != counter_1) && (str_indx != counter_2) && (arr_cor_pos[str_indx] != 1))
+                            {
+                                cout<<endl<<"now swapping counter_2: "<<str_guess[counter_1]<<" with str_indx: "<<str_indx;
+                                swap(str_guess[counter_1],str_guess[str_indx]);
+                                break;
+                            }
+                        }
+                    }
+                    if(swap_oth == true)
+                    {
+                        cout<<endl<<"now swapping 3-counter_1: "<<str_guess[3-counter_1]<<" with 3-counter_2 "<<str_guess[3-counter_2];
+                        swap(str_guess[3-counter_1],str_guess[3-counter_2]);
+                    }
+                    prev_feed_index = feed_index;
+                    turn++;
+                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                    cout<<endl<<"Number of correct digits with correct position: ";
+                    cin>>feed_index;
+                    str_guess_backup = str_guess;
+                    swap_dig = !(swap_dig);
+                    swap_oth = !(swap_oth);
+                }
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                break;
             case 0:
-                    cout<<endl<<"00000000000000000000000000000000000\nThis is case 0:\n00000000000000000000000000000000000";
-                    counter_1 = 0,counter_2 = 0;
-                    cout<<endl<<"Now trying to swap nums to get feed two";
-                    //Updating index matrix
-                    temp1 = 0;
-                    for(int str_indx=0;str_indx<4;str_indx++)
+                cout<<endl<<"000000\nEntering case 0\n000000\n";
+                if(case_0_cnt == 0)
+                {
+                    swap(str_guess[counter_1],str_guess[3-counter_1]);
+                    swap(str_guess[counter_2],str_guess[3-counter_2]);
+                }
+                else
+                {
+                    if((str_guess[counter_1]!= str_guess_backup[3-counter_1]) && (str_guess[counter_1]!= str_guess_backup[3-counter_2]))
                     {
-                        while(inc_index_mat[0][temp1] != int(str_guess[str_indx]) - 48)
-                        {
-                            temp1++;
-                        }
-                        inc_index_mat[str_indx+1][temp1] = 1;
+                        swap(str_guess[counter_1],str_guess[6-counter_1 -(3- counter_1 + 3-counter_2)]);
+                        swap(str_guess[counter_2],str_guess[6-counter_2 -(3- counter_1 + 3-counter_2)]);
                     }
-                    for(counter_1 = 0;counter_1<3;counter_1++)
+                }
+                prev_feed_index = feed_index;
+                turn++;
+                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                cout<<endl<<"Number of correct digits with correct position: ";
+                cin>>feed_index;
+                break;
+            case 1:
+                cout<<endl<<"111111\nEntering case 1\n111111\n";
+                //str_guess[counter_1] is right
+                cout<<endl<<"now assuming str_guess[counter_1] is right: "<<str_guess[counter_1];
+                swap_dig = true;
+                while((feed_index != 0) && (feed_index != 4))
+                {
+                    if(swap_dig == true)
                     {
-                        cout<<endl<<"This is our index mat: ";
-                        for(int i=0;i<3;i++)
+                        cout<<endl<<"this is swap dig";
+                        for(int str_indx=0;str_indx<4;str_indx++)
                         {
-                            cout<<endl;
-                            for(int j=0;j<4;j++)
+                            if((str_indx != counter_1) && (str_indx != counter_2) && (arr_cor_pos[str_indx] != 1))
                             {
-                                cout<<inc_index_mat[i][j]<<' ';
-                            }
-                        }
-                        cout<<endl<<"First pos counter: "<<counter_1;
-                        index_counter = 0;
-                        while(inc_index_mat[0][index_counter] != int(str_guess[counter_1]) - 48)
-                        {
-                            index_counter++;
-                        }
-                        cout<<endl<<counter_1<<"th num in guess: "<<str_guess[counter_1]<<" and the num in mat: "<<inc_index_mat[0][index_counter];
-                        for(counter_2 = counter_1+1;counter_2<4;counter_2++)
-                        {
-                            cout<<endl<<str_guess[counter_1]<<" to index "<<counter_2<<endl;
-                            cout<<endl<<"Second pos counter: "<<counter_2;
-                            counter = 0;
-                            while(inc_index_mat[0][counter] != int(str_guess[counter_2]) - 48)
-                            {
-                                counter++;
-                            }
-                            cout<<endl<<str_guess[counter_2]<<" to index "<<counter_1<<endl;
-                            cout<<endl<<"checking conds: for first num: "<<inc_index_mat[counter_2+1][index_counter]<<" for second num: "<<inc_index_mat[counter_1+1][counter];
-                            if((inc_index_mat[counter_2+1][index_counter] ==0) && (inc_index_mat[counter_1+1][counter] ==0))
-                            {
-                                swap(str_guess[counter_1],str_guess[counter_2]);
-                                turn++;
-                                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                cout<<endl<<"Number of correct positions: ";
-                                cin>>feed_index;
-                                
-                                if(feed_index != 2)
-                                {
-                                    if(feed_index == 4)
-                                    {
-                                        cout<<endl<<"Yooooo I won!!!!!!";
-                                        return 1;
-                                    }
-                                    if(feed_index == 0)
-                                    {
-                                        cout<<endl<<"Entering the feed index = 0 sec";
-                                        //Updating index matrix
-                                        temp1 = 0;
-                                        cout<<endl<<"Now checking mat update: (temp1: "<<temp1<<")";
-                                        for(int str_indx=0;str_indx<4;str_indx++)
-                                        {
-                                            temp1 = 0;
-                                            cout<<endl<<"string index "<<str_indx<<" with value "<<str_guess[str_indx];
-                                            while(inc_index_mat[0][temp1] != int(str_guess[str_indx]) - 48)
-                                            {
-                                                temp1++;
-                                            }
-                                            cout<<endl<<"temp1: "<<temp1;
-                                            inc_index_mat[str_indx+1][temp1] = 1;
-                                        }
-                                        cout<<endl<<"This is our index mat: ";
-                                        for(int i=0;i<5;i++)
-                                        {
-                                            cout<<endl;
-                                            for(int j=0;j<4;j++)
-                                            {
-                                                cout<<inc_index_mat[i][j]<<' ';
-                                            }
-                                        }   
-                                    }
-                                    swap(str_guess[counter_1],str_guess[counter_2]);
-                                    cout<<endl<<"Oh man no feed 2 so undoing changes -> "<<str_guess;
-                                }
-                                else if(feed_index == 2)
-                                {
-                                    cout<<endl<<"Oh yeah so I just have to change the two other digits!!!";
-                                    while(1)
-                                    {
-                                        int ct1=0,ct2;
-                                        while((ct1 == counter_1) || (ct1 == counter_2))
-                                        {
-                                            ct1++;
-                                        }
-                                        ct2 = ct1+1;
-                                        while((ct2 == counter_1) || (ct2 == counter_2))
-                                        {
-                                            ct2++;
-                                        }
-                                        cout<<endl<<"main ind: "<<counter_1<<" & "<<counter_2;
-                                        cout<<endl<<"found ind: "<<ct1<<" & "<<ct2;
-                                        swap(str_guess[ct1],str_guess[ct2]);
-                                        cout<<endl<<str_guess;
-                                        cout<<endl<<"Yooooo I won!!!!!!";
-                                        return 1;
-                                    }
-                                }
+                                cout<<endl<<"now swapping counter_2: "<<str_guess[counter_2]<<" with str_indx: "<<str_indx;
+                                swap(str_guess[counter_2],str_guess[str_indx]);
+                                break;
                             }
                         }
                     }
-                    break;
-            case 1: cout<<endl<<"11111111111111111111111111111111111111111\nThis is case 1\n11111111111111111111111111111111111111111";
-                    cout<<endl<<"Now trying to see if it is inc nc dec";
-                    counter = 0;
-                    index_counter = 1;
-                    while(1)
+                    if(swap_oth == true)
                     {
-                        swap(str_guess[counter],str_guess[index_counter]);
-                        str_guess_backup = str_guess;
-                        cout<<endl<<"In while, after swapping";
-                        prev_feed_index = feed_index;
-                        turn++;
-                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                        cout<<endl<<"Number of correct positions: ";
-                        cin>>feed_index;
-                        //Feedback: dc
-                        if(feed_index - prev_feed_index == -1)
-                        {
-                            cout<<endl<<"This is decrease mode";
-                            swap(str_guess[counter],str_guess[index_counter]);
-                            swap(str_guess[3-counter],str_guess[3-index_counter]);
-                            cout<<endl<<"assuming num["<<counter<<"] is right";
-                            for(int str_indx = 0;str_indx<3;str_indx++)
-                            {
-                                if((str_indx != counter) && (str_indx != index_counter))
-                                {
-                                    swap(str_guess[index_counter],str_guess[str_indx]);
-                                    turn++;
-                                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                    cout<<endl<<"Number of correct positions: ";
-                                    cin>>feed_index;
-                                    if(feed_index == 4)
-                                    {
-                                        win = true;
-                                        break;
-                                    }
-                                    
-                                }
-                                if(win == true)
-                                {
-                                    cout<<endl<<"Yooooo I won!!!!!!";
-                                    return 1;
-                                }
-                            }
-                        }
-                        //Feedback: no change
-                        if(feed_index - prev_feed_index == 0)
-                        {
-                            //Swapping the other two digits (bacd = 0)
-                            cout<<endl<<"This is no change mode";
-                            if(feed_index ==0)
-                            {
-                                cout<<endl<<"Undoing changes";
-                                swap(str_guess[counter],str_guess[index_counter]);
-                                //Assuming num[counter] is right
-                                cout<<endl<<"Assuming num["<<counter<<"] is right";
-                                for(int str_indx=0;str_indx<4;str_indx++)
-                                {
-                                    cout<<endl<<"Entering the first for loop";
-                                    if((str_indx != counter) && (str_indx != index_counter)) 
-                                    {
-                                        cout<<endl<<"swapping in the first loop";
-                                        swap(str_guess[index_counter],str_guess[str_indx]);
-                                        prev_feed_index = feed_index;
-                                        turn++;
-                                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                        cout<<endl<<"Number of correct positions: ";
-                                        cin>>feed_index;
-                                        if(feed_index==4)
-                                        {
-                                            cout<<endl<<"received feed 4";
-                                            win = true;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            cout<<endl<<"no feed 4 so undoing changes";
-                                            swap(str_guess[index_counter],str_guess[str_indx]);
-                                        }
-                                    }
-                                    if(win == true)
-                                    {
-                                        cout<<endl<<"Yooooo I won!!!!!!";
-                                        return 1;
-                                    }
-                                    else
-                                    {
-                                        
-                                        cout<<endl<<"Assuming num["<<index_counter<<"] is in right pos";
-                                        for(int str_indx=0;str_indx<4;str_indx++)
-                                        {
-                                            cout<<endl<<"Entering the second for loop";
-                                            if((str_indx != counter) && (str_indx != index_counter)) 
-                                            {
-                                                swap(str_guess[counter],str_guess[str_indx]);
-                                                prev_feed_index = feed_index;
-                                                turn++;
-                                                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                                cout<<endl<<"Number of correct positions: ";
-                                                cin>>feed_index;
-                                                if(feed_index==4)
-                                                {
-                                                    cout<<endl<<"received feed 4";
-                                                    cout<<endl<<"Yooooo I won!!!!!!";
-                                                    return 1;
-                                                } 
-                                                else
-                                                {
-                                                    cout<<endl<<"no feed 4 so undoing change";
-                                                    swap(str_guess[counter],str_guess[str_indx]);
-                                                }  
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            //checking if badc = 0
-                            int ct1=0,ct2;
-                            while((ct1 == counter) || (ct1 == index_counter))
-                            {
-                                ct1++;
-                            }
-                            ct2 = ct1+1;
-                            while((ct2 == counter) || (ct2 == index_counter))
-                            {
-                                ct2++;
-                            }
-                            cout<<endl<<"main ind: "<<counter<<" & "<<index_counter;
-                            cout<<endl<<"found ind: "<<ct1<<" & "<<ct2;
-                            swap(str_guess[ct1],str_guess[ct2]);
-                            cout<<endl<<str_guess;
-                            turn++;
-                            cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                            cout<<endl<<"Number of correct positions: ";
-                            cin>>feed_index;
-                            //one of them was right
-                            if(feed_index == 0)
-                            {
-                                str_guess = str_guess_backup;
-                                swap(str_guess[counter],str_guess[index_counter]);
-                                //Assuming num[counter] is right
-                                cout<<endl<<"Assuming num["<<counter<<"] is right";
-                                for(int str_indx=0;str_indx<4;str_indx++)
-                                {
-                                    cout<<endl<<"Entering the first for loop";
-                                    if((str_indx != counter) && (str_indx != index_counter)) 
-                                    {
-                                        cout<<endl<<"swapping in the first loop";
-                                        swap(str_guess[index_counter],str_guess[str_indx]);
-                                        prev_feed_index = feed_index;
-                                        turn++;
-                                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                        cout<<endl<<"Number of correct positions: ";
-                                        cin>>feed_index;
-                                        if(feed_index==4)
-                                        {
-                                            cout<<endl<<"received feed 4";
-                                            win = true;
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            cout<<endl<<"no feed 4 so undoing changes";
-                                            swap(str_guess[index_counter],str_guess[str_indx]);
-                                        }
-                                    }
-                                    if(win == true)
-                                    {
-                                        cout<<endl<<"Yooooo I won!!!!!!";
-                                        return 1;
-                                    }
-                                    else
-                                    {   
-                                        cout<<endl<<"Assuming num["<<index_counter<<"] is in right pos";
-                                        for(int str_indx=0;str_indx<4;str_indx++)
-                                        {
-                                            cout<<endl<<"Entering the second for loop";
-                                            if((str_indx != counter) && (str_indx != index_counter)) 
-                                            {
-                                                swap(str_guess[counter],str_guess[str_indx]);
-                                                prev_feed_index = feed_index;
-                                                turn++;
-                                                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                                cout<<endl<<"Number of correct positions: ";
-                                                cin>>feed_index;
-                                                if(feed_index==4)
-                                                {
-                                                    cout<<endl<<"received feed 4";
-                                                    cout<<endl<<"Yooooo I won!!!!!!";
-                                                    return 1;
-                                                } 
-                                                else
-                                                {
-                                                    cout<<endl<<"no feed 4 so undoing change";
-                                                    swap(str_guess[counter],str_guess[str_indx]);
-                                                }  
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }   
-                        //Feedback: increase by 1   
-                        if(feed_index - prev_feed_index == 1)
-                        {
-                            cout<<endl<<"this is inc mode";
-                            //Assuming num[counter] is in the right position -> swapping other digits
-                            cout<<endl<<"Assuming num["<<index_counter<<"] is in right pos";
-                            for(int str_indx=0;str_indx<4;str_indx++)
-                            {
-                                cout<<endl<<"Entering the first for loop";
-                                if((str_indx != counter) && (str_indx != index_counter)) 
-                                {
-                                    cout<<endl<<"swapping in the first loop";
-                                    swap(str_guess[counter],str_guess[str_indx]);
-                                    prev_feed_index = feed_index;
-                                    turn++;
-                                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                    cout<<endl<<"Number of correct positions: ";
-                                    cin>>feed_index;
-                                    if(feed_index==4)
-                                    {
-                                        cout<<endl<<"received feed 4";
-                                        win = true;
-                                        break;
-                                    }
-                                    else if(feed_index == 0)
-                                    {
-                                        cout<<endl<<"so num["<<counter<<"] is right";
-                                        swap(str_guess[counter],str_guess[str_indx]);
-                                        swap(str_guess[index_counter],str_guess[6-(counter+index_counter+str_indx)]);
-                                        turn++;
-                                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                        cout<<endl<<"Number of correct positions: ";
-                                        cin>>feed_index;
-                                        //break;
-                                    }
-                                    else
-                                    {
-                                        cout<<endl<<"no feed 4 so undoing change";
-                                        swap(str_guess[counter],str_guess[str_indx]);
-                                    }
-                                }
-                            }
-                            if(win == true)
-                            {
-                                cout<<endl<<"Yooooo I won!!!!!!";
-                                return 1;
-                            }
-                            else
-                            {
-                                str_guess = str_guess_backup;
-                                cout<<endl<<"Assuming num["<<index_counter<<"] is in right pos";
-                                for(int str_indx=0;str_indx<4;str_indx++)
-                                {
-                                    cout<<endl<<"Entering the second for loop";
-                                    if((str_indx != counter) && (str_indx != index_counter)) 
-                                    {
-                                        swap(str_guess[index_counter],str_guess[str_indx]);
-                                        prev_feed_index = feed_index;
-                                        turn++;
-                                        cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
-                                        cout<<endl<<"Number of correct positions: ";
-                                        cin>>feed_index;
-                                        if(feed_index==4)
-                                        {
-                                            cout<<endl<<"received feed 4";
-                                            cout<<endl<<"Yooooo I won!!!!!!";
-                                            return 1;
-                                        } 
-                                        else
-                                        {
-                                            cout<<endl<<"no feed 4 so undoing change";
-                                            swap(str_guess[index_counter],str_guess[str_indx]);
-                                        }  
-                                    }
-                                }
-                            }
-                        }
-                        index_counter++;
-                        if(index_counter == 4)
-                        {
-                            index_counter = 2;
-                            counter++;
-                        }  
+                        cout<<endl<<"now swapping 3-counter_1: "<<str_guess[3-counter_1]<<" with 3-counter_2 "<<str_guess[3-counter_2];
+                        swap(str_guess[3-counter_1],str_guess[3-counter_2]);
                     }
-                    break;
-            case 4:
-                    cout<<endl<<"Yooooo I won!!!!!!";
-                    return 1;
-                    break;
-            default: error_cout("\nWrong feedback!!!\n");
-                    break;
+                    prev_feed_index = feed_index;
+                    turn++;
+                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                    cout<<endl<<"Number of correct digits with correct position: ";
+                    cin>>feed_index;
+                    str_guess_backup = str_guess;
+                    swap_dig = !(swap_dig);
+                    swap_oth = !(swap_oth);
+                }
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                //str_guess[counter_2] is right
+                cout<<endl<<"now assuming str_guess[counter_2] is right: "<<str_guess[counter_2];
+                swap_dig = true;
+                swap_oth = false;
+                while((feed_index != 0) && (feed_index != 4))
+                {
+                    if(swap_dig == true)
+                    {
+                        cout<<endl<<"this is swap dig";
+                        for(int str_indx=0;str_indx<4;str_indx++)
+                        {
+                            if((str_indx != counter_1) && (str_indx != counter_2) && (arr_cor_pos[str_indx] != 1))
+                            {
+                                cout<<endl<<"now swapping counter_2: "<<str_guess[counter_1]<<" with str_indx: "<<str_indx;
+                                swap(str_guess[counter_1],str_guess[str_indx]);
+                                break;
+                            }
+                        }
+                    }
+                    if(swap_oth == true)
+                    {
+                        
+                        cout<<endl<<"now swapping 3-counter_1: "<<str_guess[3-counter_1]<<" with 3-counter_2 "<<str_guess[3-counter_2];
+                        swap(str_guess[3-counter_1],str_guess[3-counter_2]);
+                    }
+                    prev_feed_index = feed_index;
+                    turn++;
+                    cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                    cout<<endl<<"Number of correct digits with correct position: ";
+                    cin>>feed_index;
+                    str_guess_backup = str_guess;
+                    swap_dig = !(swap_dig);
+                    swap_oth = !(swap_oth);
+                }
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                break;
+            case 2:
+                cout<<endl<<"222222\nEntering case 2\n222222\n";
+                swap(str_guess[counter_1],str_guess[counter_2]);
+                turn++;
+                cout<<endl<<"Turn: "<<turn<<"  Guess: "<<str_guess;
+                cout<<endl<<"Number of correct digits with correct position: ";
+                cin>>feed_index;
+                if(feed_index == 4)
+                {
+                    cout<<endl<<"I won!!!!";
+                    return 0;
+                }
+                break;
         }
-    }*/
+    }
     return 0;
 }
